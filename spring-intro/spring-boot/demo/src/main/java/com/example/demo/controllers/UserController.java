@@ -9,22 +9,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.demo.dtos.user.UserAddDTO;
-import com.example.demo.model.User;
-import com.example.demo.repositories.PermissionRepository;
+import com.example.demo.repositories.RoleRepository;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.services.UserService;
-
-
 
 @Controller
 @RequestMapping("/api")
 public class UserController {
-    
+
     @Autowired
     private UserRepository repository;
 
     @Autowired
-    private PermissionRepository permissionRepository;
+    private RoleRepository roleRepository;
 
     @Autowired
     private UserService service;
@@ -36,21 +33,15 @@ public class UserController {
     }
 
     @GetMapping("/create-user")
-    public String getFormulate() {
+    public String getFormulate(Model model) {
+        model.addAttribute("user", new UserAddDTO());
+        model.addAttribute("roles", roleRepository.findAll());
         return "users/createUser";
     }
 
     @PostMapping("/users")
     public String addUsers(@ModelAttribute("user") UserAddDTO dto) {
-        System.out.println(dto.getUsername());
-        System.out.println(dto.getEmail());
-        User user = new User();
-        user.setName(dto.getUsername());
-        user.setUsername(dto.getEmail());
-        user.setPassword("sdas");
-        repository.save(user);
+        service.createUser(dto);
         return "redirect:/api/users";
     }
-
-
 }
